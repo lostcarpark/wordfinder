@@ -13,10 +13,10 @@ function App() {
 
   const foundWords = [];
   let numFound = 0;
+  let numRepeating = 0;
   console.log("Len: ", wordLength, numFound, words.length);
   nextWord: for (let word in words) {
     //console.log(word, word.length, wordLength);
-    if (numFound >= maxWords) break;
     if (word.length !== wordLength) continue;
     for (let i = 0; i < wordLength; i++)
       if (knownLetters[i] && word.charAt(i) !== knownLetters[i])
@@ -25,8 +25,12 @@ function App() {
     for (const c of excludeLetters) if (word.includes(c)) continue nextWord;
     if (noRepeatLetters)
       for (const c of word)
-        if (word.match(new RegExp(c, "gi") || []).length > 1) continue nextWord;
-    foundWords.push(<p key={word}>{word}</p>);
+        if (word.match(new RegExp(c, "gi") || []).length > 1) {
+          numRepeating++;
+          continue nextWord;
+        }
+    // Only add to list if haven't reached maximum.
+    if (numFound <= maxWords) foundWords.push(<p key={word}>{word}</p>);
     numFound++;
   }
   console.log("Found", foundWords);
@@ -112,6 +116,12 @@ function App() {
           }}
           value="Reset"
         />
+      </div>
+      <div>Total number of words found: {numFound}</div>
+      <div>
+        {numRepeating > 0
+          ? "Number of words excluded with repeating letters: " + numRepeating
+          : ""}
       </div>
       <div>{foundWords}</div>
     </div>
