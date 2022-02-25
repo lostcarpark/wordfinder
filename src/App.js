@@ -9,6 +9,7 @@ function App() {
   const [knownLetters, setKnownLetters] = useState([]);
   const [includeLetters, setIncludeLetters] = useState("");
   const [excludeLetters, setExcludeLetters] = useState("");
+  const [noRepeatLetters, setNoRepeatLetters] = useState(false);
 
   const foundWords = [];
   let numFound = 0;
@@ -18,9 +19,13 @@ function App() {
     if (numFound >= maxWords) break;
     if (word.length !== wordLength) continue;
     for (let i = 0; i < wordLength; i++)
-      if (knownLetters[i] && word.charAt(i) !== knownLetters[i]) continue nextWord;
+      if (knownLetters[i] && word.charAt(i) !== knownLetters[i])
+        continue nextWord;
     for (const c of includeLetters) if (!word.includes(c)) continue nextWord;
     for (const c of excludeLetters) if (word.includes(c)) continue nextWord;
+    if (noRepeatLetters)
+      for (const c of word)
+        if (word.match(new RegExp(c, "gi") || []).length > 1) continue nextWord;
     foundWords.push(<p key={word}>{word}</p>);
     numFound++;
   }
@@ -86,6 +91,26 @@ function App() {
           type="text"
           value={excludeLetters}
           onChange={(e) => setExcludeLetters(e.target.value)}
+        />
+      </div>
+      <div>
+        <input
+          id="noRepeatLetters"
+          type="checkbox"
+          checked={noRepeatLetters}
+          onChange={(e) => setNoRepeatLetters(e.target.checked)}
+        />
+        <label htmlFor="noRepeatLetters">No repeat letters</label>
+      </div>
+      <div>
+        <input
+          type="button"
+          onClick={(e) => {
+            setIncludeLetters("");
+            setExcludeLetters("");
+            setKnownLetters([]);
+          }}
+          value="Reset"
         />
       </div>
       <div>{foundWords}</div>
